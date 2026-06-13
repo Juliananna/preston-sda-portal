@@ -28,6 +28,10 @@ service cloud.firestore {
       allow read, create, update, delete: if isLeader();
     }
 
+    match /artifacts/{appId}/public/data/households/{docId} {
+      allow read, create, update, delete: if isLeader();
+    }
+
     match /artifacts/{appId}/public/data/requests/{docId} {
       allow create: if true;
       allow read, update, delete: if isLeader();
