@@ -23,6 +23,7 @@ export const paths = {
   content: () => collection(db, `artifacts/${appId}/public/data/content`),
   roster: () => collection(db, `artifacts/${appId}/public/data/roster`),
   members: () => collection(db, `artifacts/${appId}/public/data/members`),
+  households: () => collection(db, `artifacts/${appId}/public/data/households`),
   requests: () => collection(db, `artifacts/${appId}/public/data/requests`),
   messages: () => collection(db, `artifacts/${appId}/public/data/messages`),
   audit: () => collection(db, `artifacts/${appId}/public/data/audit`),
