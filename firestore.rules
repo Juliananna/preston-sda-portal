@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isLeader() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function isSuperAdmin() {
+      return signedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superAdmin';
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (uid == request.auth.uid || isSuperAdmin());
+      allow write: if false; // managed by Cloud Functions only
+    }
+
+    match /artifacts/{appId}/public/data/content/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isLeader();
+    }
+
+    match /artifacts/{appId}/public/data/roster/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isLeader();
+    }
+
+    match /artifacts/{appId}/public/data/members/{docId} {
+      allow read, create, update, delete: if isLeader();
+    }
+
+    match /artifacts/{appId}/public/data/requests/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isLeader();
+    }
+
+    match /artifacts/{appId}/public/data/messages/{docId} {
+      allow read, create, update: if isLeader();
+      allow delete: if false;
+    }
+
+    match /artifacts/{appId}/public/data/preacherLinks/{token} {
+      allow read, write: if false; // managed by Cloud Functions only
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
